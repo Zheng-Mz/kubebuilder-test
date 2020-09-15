@@ -1,0 +1,3 @@
+domain: zmz.example.org
+repo: github.com/Zheng-Mz/kubebuilder-test
+version: "2"
