@@ -1,0 +1,7 @@
+apiVersion: zmzapp.zmz.example.org/v1
+kind: TestK
+metadata:
+  name: testk-sample
+spec:
+  # Add fields here
+  foo: bar
