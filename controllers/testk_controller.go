@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -55,8 +56,8 @@ func (r *TestKReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	// Using a typed object.
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: "default",
-			Name:      "name-pod",
+			Namespace: req.NamespacedName.Namespace,
+			Name:      "test-pod",
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{
@@ -68,7 +69,10 @@ func (r *TestKReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		},
 	}
 	// r is a created client.
-	_ = r.Create(context.Background(), pod)
+	err = r.Create(context.Background(), pod)
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not Create Pod: %+v", err)
+	}
 
 	/*
 		// create a ReplicaSet
