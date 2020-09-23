@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: testk-test
+---
 apiVersion: zmzapp.zmz.example.org/v1
 kind: TestK
 metadata:
   name: testk-sample
+  namespace: testk-test
 spec:
   # Add fields here
   foo: bar
