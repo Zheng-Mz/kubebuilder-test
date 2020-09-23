@@ -33,6 +33,7 @@ import (
 	//"sigs.k8s.io/controller-runtime/pkg/source"
 
 	zmzappv1 "github.com/Zheng-Mz/kubebuilder-test/api/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -47,6 +48,7 @@ type TestKReconciler struct {
 // +kubebuilder:rbac:groups=zmzapp.zmz.example.org,resources=testks,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=zmzapp.zmz.example.org,resources=testks/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=core,resources=pobs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 func (r *TestKReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
@@ -63,25 +65,19 @@ func (r *TestKReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 	log.Info("A new TestK", "TestK.Namespace", appRs.Namespace, "TestK.Name", appRs.Name)
 
-	// Using a typed object.
-	pod := &corev1.Pod{
+	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Namespace: appRs.Namespace,
-			Name:      appRs.Name,
+			Labels:      make(map[string]string),
+			Annotations: make(map[string]string),
+			Name:        appRs.Name,
+			Namespace:   appRs.Namespace,
 		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				corev1.Container{
-					Image: "nginx",
-					Name:  "nginx",
-				},
-			},
-		},
+		Spec: *appRs.Spec.DeploySpec.DeepCopy(),
 	}
 
-	log.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-	if err = r.Create(context.Background(), pod); err != nil {
-		return ctrl.Result{}, fmt.Errorf("could not Create Pod: %v", err)
+	log.Info("Creating a new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
+	if err = r.Create(context.Background(), dep); err != nil {
+		return ctrl.Result{}, fmt.Errorf("could not Create Deployment: %v", err)
 	}
 	/*
 		controllerutil.SetControllerReference(appRs, pod, r.Scheme)
@@ -202,7 +198,7 @@ func (r *TestKReconciler) Map(obj handler.MapObject) []reconcile.Request {
 func (r *TestKReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&zmzappv1.TestK{}).
-		//Owns(&corev1.Service{}).
+		Owns(&appsv1.Deployment{}).
 		//Owns(&corev1.Pod{}).
 		//Watches(&source.Kind{Type: &corev1.Service{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: r}).
 		//Watches(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: r}).
