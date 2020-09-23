@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,6 +31,9 @@ type TestKSpec struct {
 
 	// Foo is an example field of TestK. Edit TestK_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
+
+	// Specifies the deployment that will be created when executing a TestK.
+	DeploySpec appsv1.DeploymentSpec `json:"deploySpec"`
 }
 
 // TestKStatus defines the observed state of TestK
