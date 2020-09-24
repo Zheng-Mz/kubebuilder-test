@@ -18,6 +18,7 @@ package v1
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -31,6 +32,9 @@ type TestKSpec struct {
 
 	// Foo is an example field of TestK. Edit TestK_types.go to remove/update
 	Foo string `json:"foo,omitempty"`
+
+	//ServicePort
+	ServicePort []corev1.ServicePort `json:"servicePort,omitempty"`
 
 	// Specifies the deployment that will be created when executing a TestK.
 	DeploySpec appsv1.DeploymentSpec `json:"deploySpec"`
